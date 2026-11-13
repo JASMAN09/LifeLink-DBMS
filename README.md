@@ -64,7 +64,7 @@ Reset is blocked when `APP_ENV=production` and refuses any `DB_NAME` other than 
 
 ## Publishing and going live
 
-The project uses Flask and MySQL. It is prepared for a GitHub repository, but is not uploaded or deployed. Before publishing, use GitHub Desktop or Git to review the file list and confirm `.env`, virtual environments, database exports, and real personal data are excluded. Start with the [deployment checklist](docs/deployment_checklist.md). Public hosting needs a separate reachable MySQL provider, production secrets, and TLS configuration; local demo access is disabled in production.
+The source code is published at https://github.com/JASMAN09/LifeLink-DBMS. This is a public academic prototype repository; the app is not deployed. Before future updates, review the staged files and confirm `.env`, virtual environments, database exports, and real personal data are excluded. See the [deployment checklist](docs/deployment_checklist.md). Public hosting still needs a separate reachable MySQL provider, production secrets, and TLS configuration; local demo access is disabled in production.
 
 ## Main workflows
 
@@ -95,24 +95,22 @@ Syntax, Flask routes, template compilation and public HTTP routes can be checked
 
 Production mode fails closed unless a long Flask secret, non-root MySQL credentials and a CA certificate file for verified MySQL TLS are configured. The local development defaults are not accepted in production. Render's Flask guide uses Gunicorn with `gunicorn app:app`; Render environment variables should be configured in its service dashboard rather than committed to the repository ([Flask deploy guide](https://render.com/docs/deploy-flask), [environment variables](https://render.com/docs/configure-environment-variables)).
 
-1. Create a GitHub repository and push this project only after reviewing `git status`. `.env`, `.env.*` (except `.env.example`), private key files and local virtual environments are ignored. Never upload real patient or donor information.
+1. The source is already published at https://github.com/JASMAN09/LifeLink-DBMS. For future updates, review `git status` before staging. `.env`, `.env.*` (except `.env.example`), private key files and local virtual environments are ignored. Never upload real patient or donor information.
 2. Provision a managed MySQL 8 database reachable from the web service. Create database `lifelink`, a runtime user with only the application privileges (`SELECT`, `INSERT`, `UPDATE`, `DELETE`), and a separate migration/setup account with schema privileges. Restrict network access to the app where the provider supports private networking or source IP rules. Download the provider's CA certificate; do not disable TLS verification.
 3. From a controlled migration environment, set `APP_ENV=production`, `DB_HOST`, `DB_PORT`, `DB_NAME=lifelink`, `DB_SETUP_USER`, `DB_SETUP_PASSWORD`, `DB_SSL_CA`, `FLASK_SECRET_KEY` (at least 32 random characters), plus `BOOTSTRAP_ADMIN_USERNAME`, `BOOTSTRAP_ADMIN_EMAIL` and a one-time `BOOTSTRAP_ADMIN_PASSWORD` (16+ characters). Set `DB_USER` and `DB_PASSWORD` to the runtime account. Run `python setup_db.py`. Production setup inserts only roles, permissions, blood groups/components and the secure bootstrap admin; it does not seed demo patients, donors, emergencies or demo credentials. Remove the bootstrap password and setup-account secrets after successful initialization. For later schema migrations, run the setup command only from the controlled migration environment.
 4. In Render, create **New → Web Service** from the pushed repository. Use root directory `.`, runtime **Python**, build command `pip install -r requirements.txt`, and start command `gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120`. The project includes a `Procfile` and `.python-version` for the same runtime setup.
 5. Add the runtime environment variables in Render's Environment settings: `APP_ENV=production`, `FLASK_SECRET_KEY`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME=lifelink`, `DB_SSL_CA` (path to a securely mounted CA file), and `COOKIE_SECURE=true`. Do not configure `FLASK_DEBUG=true`. The setup/bootstrap secrets should not be present in the running web service.
 6. Deploy, then verify `/health` returns `200` and `/health/db` returns `200`. Create the first hospital, then use the bootstrap administrator account to register operational records. Set a new administrator password after the first login and retain access to database backups/restore procedures.
 
-Example GitHub publishing commands after creating an empty remote repository:
+To publish future changes from this existing clone:
 
 ```powershell
-git init
-git add .
 git status --short
+git add -A
+git diff --cached --name-only
 # Verify .env and personal data are not staged.
-git commit -m "Prepare LifeLink application"
-git branch -M main
-git remote add origin https://github.com/YOUR-ACCOUNT/YOUR-REPOSITORY.git
-git push -u origin main
+git commit -m "Describe your changes"
+git push
 ```
 
-These steps prepare a deployment; LifeLink has not been published or deployed. The managed MySQL provider, GitHub remote, secrets, CA certificate and production smoke test still need to be supplied/configured.
+LifeLink source is published on GitHub, but the app has not been deployed. A managed MySQL provider, production secrets, a CA certificate, and production smoke tests still need to be configured.

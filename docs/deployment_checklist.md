@@ -1,12 +1,12 @@
 # Repository and live deployment checklist
 
-LifeLink is a local academic prototype. This checklist prepares a safe handoff; it does not publish or deploy the app.
+LifeLink is an academic prototype. Its source is published at https://github.com/JASMAN09/LifeLink-DBMS; this checklist covers future repository updates and separate live deployment, which is not set up yet.
 
-## Publish the existing folder
+## Repository status and future updates
 
-1. Open the existing `LifeLink` folder in GitHub Desktop or VS Code. The local Git repository is initialized in this folder; no files have been committed or uploaded.
-2. Review the changed file list before staging. Confirm `.env`, `venv/`, `.venv/`, `instance/`, database exports, and real personal data are not included. `.gitignore` excludes local secrets, virtual environments, generated keys, and local database files.
-3. Commit the reviewed project files with a clear message. Create or select the destination repository in your Git provider, then publish the local `main` branch.
+1. The existing `LifeLink` folder is connected to the public repository above. Its initial project commit is uploaded on the `main` branch.
+2. For future changes, review the changed file list before staging. Confirm `.env`, `venv/`, `.venv/`, `instance/`, database exports, and real personal data are not included. `.gitignore` excludes local secrets, virtual environments, generated keys, and local database files.
+3. Commit reviewed changes with a clear message, then run `git push` from the existing LifeLink folder.
 4. Never use Git's “add everything” workflow without checking the staged list. Do not put `.env` values, real records, screenshots with private data, or database dumps in a public repository.
 
 ## Prepare production configuration
@@ -38,4 +38,4 @@ Render's current Flask deployment guide documents the Python web service build/s
 
 ## Not completed here
 
-No GitHub repository or hosting account was supplied, no files were pushed, and no production MySQL provider or secrets were configured. The current app has not been deployed to a public URL. The local MySQL connection and automated tests do not prove full production readiness.
+The source repository is public, but the app has not been deployed. No production MySQL provider, hosting secrets, or live URL are configured. The local MySQL connection and automated tests do not prove full production readiness.
