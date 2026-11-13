@@ -1,0 +1,18 @@
+{% extends "base_public.html" %}
+{% block title %}My LifeLink account{% endblock %}
+{% block content %}
+<section class="citizen-account page-width">
+  <div class="citizen-welcome"><div><span class="section-kicker">MY LIFELINK</span><h1>Hello, {{ citizen.full_name }}</h1><p>Manage your contact details and track the emergency reports you have sent.</p></div><a class="button button-primary" href="{{ url_for('citizen_sos') }}">Report an emergency <span aria-hidden="true">→</span></a></div>
+  {% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-stack">{% for category,message in messages %}<div class="flash flash-{{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+  <div class="citizen-account-grid">
+    <div class="account-panel"><h2>Emergency report history</h2><p class="panel-help">Updates appear here when LifeLink staff review and link a report to a hospital case.</p>
+      <div class="sos-history">{% for item in sos_requests %}<article><div><strong>{{ item.request_ref }} · {{ item.emergency_type }}</strong><span>{{ item.emergency_location }}{% if item.hospital %} · {{ item.hospital }}{% endif %}</span><small>Submitted {{ item.reported_at }}</small></div><div><span class="status-pill status-{{ item.request_status }}">{{ item.request_status }}</span>{% if item.case_ref %}<small>Case {{ item.case_ref }}</small>{% endif %}</div></article>{% else %}<div class="empty-state compact"><div>＋</div><strong>No emergency reports yet</strong><p>Reports you submit will be listed here.</p></div>{% endfor %}</div>
+      <p class="sos-critical account-safety"><strong>For urgent help</strong><span>This account is not an emergency dispatch service. Call your local emergency number if someone needs immediate help.</span></p>
+    </div>
+    <div class="account-panel"><h2>Contact details</h2><p class="panel-help">These details help staff contact you about a report.</p>
+      <form method="post" action="{{ url_for('citizen_update_profile') }}" class="data-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Full name<input name="full_name" maxlength="160" autocomplete="name" value="{{ citizen.full_name }}" required></label><label>Email<input type="email" value="{{ citizen.email }}" readonly aria-describedby="email-note"></label><small id="email-note">Contact an administrator to change your sign-in email.</small><label>Phone<input name="phone" type="tel" maxlength="30" autocomplete="tel" value="{{ citizen.phone }}" required></label><button class="button button-secondary" type="submit">Save contact details</button></form>
+      <h2>Update password</h2><form method="post" action="{{ url_for('citizen_change_password') }}" class="data-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% if not citizen.force_password_change %}<label>Current password<input type="password" name="current_password" autocomplete="current-password" required></label>{% endif %}<label>New password<input type="password" name="password" minlength="8" autocomplete="new-password" required></label><label>Confirm new password<input type="password" name="confirm_password" minlength="8" autocomplete="new-password" required></label><button class="button button-primary">Save password</button></form>
+    </div>
+  </div>
+</section>
+{% endblock %}

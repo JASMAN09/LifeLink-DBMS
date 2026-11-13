@@ -1,0 +1,37 @@
+{% extends "base_staff.html" %}
+{% block title %}Operations dashboard | LifeLink{% endblock %}
+{% block content %}
+<section class="app-page page-width">
+  {% include '_staff_sidebar.html' %}
+  <div class="app-content">
+    <div class="page-heading">
+      <div><span class="section-kicker">CONNECTED RESPONSE NETWORK</span><h1>Operations dashboard</h1><p>A quick view of current response activity and items needing attention.</p></div>
+      <div class="user-chip"><span class="user-avatar">{{ current_user.display_name[:1]|upper }}</span><span>{{ current_user.display_name }}<small>{{ current_user.role_name }}</small></span></div>
+    </div>
+    {% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-stack">{% for category,message in messages %}<div class="flash flash-{{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+
+    <div class="stat-grid dashboard-stats">
+      <a class="stat-card" href="{{ url_for('emergencies') }}"><span>ACTIVE EMERGENCIES</span><strong>{{ stats.active_cases }}</strong><small>{{ stats.cases_today }} reported today</small><i class="stat-icon stat-red" aria-hidden="true">✚</i></a>
+      <a class="stat-card" href="{{ url_for('dispatches') }}"><span>AMBULANCES READY</span><strong>{{ stats.ambulances_ready }}</strong><small>Available to dispatch</small><i class="stat-icon stat-slate" aria-hidden="true">⌁</i></a>
+      <a class="stat-card" href="{{ url_for('blood_requests') }}"><span>OPEN BLOOD REQUESTS</span><strong>{{ stats.open_requests }}</strong><small>Includes partial fulfillment</small><i class="stat-icon stat-rose" aria-hidden="true">♥</i></a>
+      <a class="stat-card" href="{{ url_for('alerts') }}"><span>OPEN ALERTS</span><strong>{{ stats.recorded_alerts }}</strong><small>Review current actions</small><i class="stat-icon stat-blue" aria-hidden="true">⚑</i></a>
+    </div>
+
+    <div class="dashboard-main">
+      <section class="table-panel">
+        <div class="table-panel-head"><div><h2>Recent emergencies</h2><span>Latest cases across your available workspace</span></div><a class="table-link" href="{{ url_for('emergencies') }}">View all →</a></div>
+        {% if emergencies %}<div class="table-scroll"><table><thead><tr><th>Case</th><th>Patient</th><th>Hospital</th><th>Status</th><th>Reported</th></tr></thead><tbody>{% for case in emergencies %}<tr><td><a class="table-link" href="{{ url_for('emergency_detail',case_id=case.emergency_case_id) }}">{{ case.case_ref }}</a></td><td>{{ case.display_name }}</td><td>{{ case.hospital }}</td><td><span class="status-pill status-{{ case.case_status|replace('_','-') }}">{{ case.case_status|replace('_',' ') }}</span></td><td>{{ case.reported_at }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state compact"><strong>No emergency cases yet.</strong><p>New cases will appear here.</p><a class="table-link" href="{{ url_for('emergencies') }}">Open emergencies →</a></div>{% endif %}
+      </section>
+      <section class="table-panel">
+        <div class="table-panel-head"><div><h2>Needs attention</h2><span>{{ stats.recorded_alerts }} open alert(s)</span></div><a class="table-link" href="{{ url_for('alerts') }}">View alerts →</a></div>
+        {% if alerts %}<div class="alert-list">{% for alert in alerts %}<article class="alert-item"><span class="alert-symbol" aria-hidden="true">{{ '♥' if alert.alert_type in ['shortage','low_stock'] else '!' }}</span><div><strong>{{ alert.alert_type|replace('_',' ')|title }} · {{ alert.severity|title }}</strong><p>{{ alert.message }}</p><small>{{ alert.created_at }}</small></div></article>{% endfor %}</div>{% else %}<div class="empty-state compact"><strong>No open alerts.</strong><p>New operational alerts will appear here.</p></div>{% endif %}
+      </section>
+    </div>
+
+    <section class="table-panel dashboard-requests">
+      <div class="table-panel-head"><div><h2>Recent blood requests</h2><span>Latest requests linked to hospital response</span></div><a class="table-link" href="{{ url_for('blood_requests') }}">Open requests →</a></div>
+      {% if recent_requests %}<div class="table-scroll"><table><thead><tr><th>Request</th><th>Emergency</th><th>Hospital</th><th>Urgency</th><th>Status</th></tr></thead><tbody>{% for row in recent_requests %}<tr><td><a class="table-link" href="{{ url_for('request_detail',request_id=row.blood_request_id) }}">{{ row.request_ref }}</a></td><td>{{ row.case_ref }}</td><td>{{ row.hospital }}</td><td>{{ row.urgency|title }}</td><td><span class="status-pill status-{{ row.request_status|replace('_','-') }}">{{ row.request_status|replace('_',' ') }}</span></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state compact"><strong>No blood requests yet.</strong><p>Requests will appear here when recorded.</p></div>{% endif %}
+    </section>
+  </div>
+</section>
+{% endblock %}

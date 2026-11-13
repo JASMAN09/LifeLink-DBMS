@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} | LifeLink{% endblock %}
+{% block content %}<section class="auth-wrap page-width"><div class="auth-card"><span class="section-kicker">LIFELINK</span><h1>{{ code }}</h1><p>{{ message }}</p><a class="button button-primary" href="{{ url_for('index') }}">Return home <span>→</span></a></div></section>{% endblock %}

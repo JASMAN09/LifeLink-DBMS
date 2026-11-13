@@ -1,0 +1,20 @@
+{% extends "base_staff.html" %}
+{% block title %}{{ case.case_ref }} | LifeLink{% endblock %}
+{% block content %}
+<section class="app-page page-width">
+  {% include '_staff_sidebar.html' %}
+  <div class="app-content">
+    <div class="page-heading"><div><span class="section-kicker">EMERGENCY CASE</span><h1>{{ case.case_ref }}</h1><p>{{ case.patient }} · {{ case.hospital }}</p></div>
+      <div class="heading-actions">{% if can('cases.write') %}<a class="button button-secondary small-button" href="{{ url_for('edit_emergency',case_id=case.emergency_case_id) }}">Edit details</a>{% endif %}<span class="status-pill status-{{ case.case_status|replace('_','-') }}">{{ case.case_status|replace('_',' ') }}</span></div>
+    </div>
+    {% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-stack">{% for category,message in messages %}<div class="flash flash-{{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+    <div class="detail-grid"><article class="detail-card"><span>Emergency location</span><strong>{{ case.emergency_location }}</strong><small>{{ case.location_notes or 'No additional location notes' }}{% if case.contact_name or case.contact_phone %}<br>Contact: {{ case.contact_name or '—' }} {{ case.contact_phone or '' }}{% endif %}<br>Type: {{ case.emergency_type }}</small></article><article class="detail-card"><span>Reported</span><strong>{{ case.reported_at }}</strong><small>Priority: {{ case.priority_label or 'Not specified' }}</small></article></div>
+    {% if can('cases.write') and case.case_status not in ['completed','cancelled'] %}<form method="post" action="{{ url_for('emergency_status',case_id=case.emergency_case_id) }}" class="inline-action"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Move case to<select name="case_status" required>{% if case.case_status=='registered' %}<option value="response_in_progress">Response in progress</option><option value="cancelled">Cancelled</option>{% elif case.case_status=='response_in_progress' %}<option value="at_hospital">At hospital</option><option value="cancelled">Cancelled</option>{% else %}<option value="completed">Completed</option><option value="cancelled">Cancelled</option>{% endif %}</select></label><button class="button button-secondary" type="submit">Update case status</button></form>{% endif %}
+    <section class="table-panel"><div class="table-panel-head"><div><h2>Linked blood requests</h2><span>Every request retains this emergency link</span></div><a class="button button-primary small-button" href="{{ url_for('blood_requests',case_id=case.emergency_case_id,new=1) }}">Create request →</a></div>
+      {% if requests %}<div class="table-scroll"><table><thead><tr><th>Request</th><th>Status</th><th>Requested</th><th></th></tr></thead><tbody>{% for row in requests %}<tr><td>{{ row.request_ref }}</td><td><span class="status-pill status-{{ row.request_status }}">{{ row.request_status|replace('_',' ') }}</span></td><td>{{ row.requested_at }}</td><td><a class="table-link" href="{{ url_for('request_detail',request_id=row.blood_request_id) }}">Open request</a></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state compact"><strong>No blood requests linked yet.</strong><p>Create one from Blood requests and select this emergency case.</p></div>{% endif %}
+    </section>
+    <section class="table-panel"><div class="table-panel-head"><div><h2>Case timeline</h2><span>Recorded response events</span></div></div>{% if events %}<div class="timeline">{% for event in events %}<article><span class="timeline-dot"></span><div><strong>{{ event.event_type|replace('_',' ')|title }}</strong><small>{{ event.event_at }}</small>{% if event.details %}<p>{{ event.details }}</p>{% endif %}</div></article>{% endfor %}</div>{% else %}<div class="empty-state compact">No case events recorded.</div>{% endif %}</section>
+  </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,47 @@
+<nav class="app-sidebar" aria-label="Operations navigation">
+  <span class="sidebar-title">LIFELINK WORKSPACE</span>
+  {% if can('dashboard.read') %}<a class="sidebar-overview {{ 'selected' if request.endpoint == 'dashboard' else '' }}" href="{{ url_for('dashboard') }}"><span aria-hidden="true">⌂</span>Dashboard</a>{% endif %}
+
+  {% set emergency_pages = ['emergencies','emergency_detail','edit_emergency','citizen_sos_queue','patients','edit_patient','ambulances','edit_fleet_record','dispatches','dispatch_detail'] %}
+  {% if can('cases.read') or can('patients.read') or can('dispatches.read') %}<details class="sidebar-group" open {% if request.endpoint in emergency_pages %}data-active{% endif %}>
+    <summary>Emergency operations</summary>
+    {% if can('cases.read') %}<a class="{{ 'selected' if request.endpoint in ['emergencies','emergency_detail','edit_emergency'] else '' }}" href="{{ url_for('emergencies') }}">Emergencies</a>{% endif %}
+    {% if can('citizen_sos.read') %}<a class="{{ 'selected' if request.endpoint == 'citizen_sos_queue' else '' }}" href="{{ url_for('citizen_sos_queue') }}">Citizen reports</a>{% endif %}
+    {% if can('patients.read') %}<a class="{{ 'selected' if request.endpoint in ['patients','edit_patient'] else '' }}" href="{{ url_for('patients') }}">Patients</a>{% endif %}
+    {% if can('ambulances.read') %}<a class="{{ 'selected' if request.endpoint in ['ambulances','edit_fleet_record'] else '' }}" href="{{ url_for('ambulances') }}">Ambulances</a>{% endif %}
+    {% if can('dispatches.read') %}<a class="{{ 'selected' if request.endpoint in ['dispatches','dispatch_detail'] else '' }}" href="{{ url_for('dispatches') }}">Ambulance dispatch</a>{% endif %}
+  </details>{% endif %}
+
+  {% set blood_pages = ['blood_requests','request_detail','edit_blood_request','transfusions','blood','edit_blood_unit','donation_components','blood_catalog','edit_catalog','screenings'] %}
+  {% if can('requests.read') or can('blood.read') %}<details class="sidebar-group" open {% if request.endpoint in blood_pages %}data-active{% endif %}>
+    <summary>Blood services</summary>
+    {% if can('requests.read') %}<a class="{{ 'selected' if request.endpoint in ['blood_requests','request_detail','edit_blood_request'] else '' }}" href="{{ url_for('blood_requests') }}">Blood requests</a><a class="{{ 'selected' if request.endpoint == 'transfusions' else '' }}" href="{{ url_for('transfusions') }}">Transfusions</a>{% endif %}
+    {% if can('blood.read') %}<a class="{{ 'selected' if request.endpoint in ['blood','edit_blood_unit','donation_components'] else '' }}" href="{{ url_for('blood') }}">Blood inventory</a><a class="{{ 'selected' if request.endpoint in ['blood_catalog','edit_catalog'] else '' }}" href="{{ url_for('blood_catalog') }}">Groups &amp; components</a><a class="{{ 'selected' if request.endpoint == 'screenings' else '' }}" href="{{ url_for('screenings') }}">Screening</a>{% endif %}
+  </details>{% endif %}
+
+  {% set donor_pages = ['donors','donor_detail','edit_donor','donor_contacts'] %}
+  {% if can('donors.read') %}<details class="sidebar-group" open {% if request.endpoint in donor_pages %}data-active{% endif %}>
+    <summary>Donor management</summary>
+    <a class="{{ 'selected' if request.endpoint in ['donors','donor_detail','edit_donor'] else '' }}" href="{{ url_for('donors') }}">Donors</a><a class="{{ 'selected' if request.endpoint == 'donor_contacts' else '' }}" href="{{ url_for('donor_contacts') }}">Contact history</a>
+  </details>{% endif %}
+
+  {% set network_pages = ['hospitals','hospital_detail','edit_hospital','transfers','transfer_detail'] %}
+  {% if can('hospitals.read') or can('transfers.read') %}<details class="sidebar-group" open {% if request.endpoint in network_pages %}data-active{% endif %}>
+    <summary>Network management</summary>
+    {% if can('hospitals.read') %}<a class="{{ 'selected' if request.endpoint in ['hospitals','hospital_detail','edit_hospital'] else '' }}" href="{{ url_for('hospitals') }}">Hospitals</a>{% endif %}
+    {% if can('transfers.read') %}<a class="{{ 'selected' if request.endpoint in ['transfers','transfer_detail'] else '' }}" href="{{ url_for('transfers') }}">Transfers</a>{% endif %}
+  </details>{% endif %}
+
+  {% if can('alerts.read') or (current_user and current_user.role_code != 'LOCAL_DEMO') %}<details class="sidebar-group" open {% if request.endpoint in ['alerts','notifications'] %}data-active{% endif %}>
+    <summary>Communication</summary>
+    {% if can('alerts.read') %}<a class="{{ 'selected' if request.endpoint == 'alerts' else '' }}" href="{{ url_for('alerts') }}">Alerts</a>{% endif %}
+    {% if current_user and current_user.role_code != 'LOCAL_DEMO' %}<a class="{{ 'selected' if request.endpoint == 'notifications' else '' }}" href="{{ url_for('notifications') }}">Notifications{% if unread_notification_count %} ({{ unread_notification_count }}){% endif %}</a>{% endif %}
+  </details>{% endif %}
+
+  {% if can('dashboard.read') or can('users.manage') %}<details class="sidebar-group" open {% if request.endpoint in ['reports','export_report','users','edit_user','approve_user','password_resets','citizen_password_resets','audit','account'] %}data-active{% endif %}>
+    <summary>Administration</summary>
+    {% if can('dashboard.read') %}<a class="{{ 'selected' if request.endpoint in ['reports','export_report'] else '' }}" href="{{ url_for('reports') }}">Reports</a>{% endif %}
+    {% if can('users.manage') %}<a class="{{ 'selected' if request.endpoint in ['users','edit_user','approve_user','password_resets','citizen_password_resets'] else '' }}" href="{{ url_for('users') }}">User access</a><a class="{{ 'selected' if request.endpoint == 'audit' else '' }}" href="{{ url_for('audit') }}">Audit history</a>{% endif %}
+    {% if current_user and current_user.role_code != 'LOCAL_DEMO' %}<a class="{{ 'selected' if request.endpoint == 'account' else '' }}" href="{{ url_for('account') }}">Account</a>{% endif %}
+  </details>{% endif %}
+</nav>

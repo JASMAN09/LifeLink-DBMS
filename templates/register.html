@@ -1,0 +1,8 @@
+{% extends "base_public.html" %}
+{% block title %}Request staff access | LifeLink{% endblock %}
+{% block content %}
+<section class="auth-wrap page-width"><div class="auth-card"><span class="section-kicker">STAFF REGISTRATION</span><h1>Request access.</h1><p>Your account remains inactive until an administrator reviews your registration and assigns a role.</p>
+  {% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-stack">{% for category,message in messages %}<div class="flash flash-{{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+  <form method="post" class="data-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Full name<input name="display_name" maxlength="160" autocomplete="name" required></label><label>Email<input name="email" type="email" maxlength="254" autocomplete="email" required></label><label>Phone<input name="phone" type="tel" maxlength="30" autocomplete="tel"></label><label>Username<input name="username" maxlength="80" autocomplete="username" required></label><label>Password (12 or more characters)<input name="password" type="password" minlength="12" autocomplete="new-password" required></label><button class="button button-primary" type="submit">Submit registration <span aria-hidden="true">→</span></button></form>
+  <a class="muted-link" href="{{ url_for('login') }}">Already approved? Sign in</a></div></section>
+{% endblock %}

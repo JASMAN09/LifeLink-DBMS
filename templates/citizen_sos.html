@@ -1,0 +1,18 @@
+{% extends "base_public.html" %}
+{% block title %}Report an emergency | LifeLink{% endblock %}
+{% block content %}
+<section class="sos-page page-width">
+  <div class="sos-intro"><span class="section-kicker">LIFELINK EMERGENCY INTAKE</span><h1>Report an emergency</h1><p>Send your location and contact details to the LifeLink coordination team. A staff member can review the report and link it to the hospital response workflow.</p><div class="sos-critical"><strong>Need immediate help?</strong><span>Call your local emergency number now. This form is not an emergency dispatch service and is not monitored continuously.</span></div></div>
+  <div class="sos-card">
+    {% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-stack">{% for category,message in messages %}<div class="flash flash-{{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+    <form method="post" class="data-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-grid"><label>Emergency type<input name="emergency_type" maxlength="100" placeholder="For example: road incident" required></label><label>Priority<select name="priority_label" required><option value="urgent">Urgent</option><option value="critical">Critical</option></select></label>
+      <label class="sos-wide">Location or address<input name="emergency_location" maxlength="255" autocomplete="street-address" placeholder="Street, area, nearby landmark" required></label>
+      <label>Preferred hospital <select name="preferred_hospital_id"><option value="">Let the coordination team triage</option>{% for hospital in hospitals %}<option value="{{ hospital.value }}">{{ hospital.label }} · {{ hospital.city }}</option>{% endfor %}</select></label>
+      <label class="sos-wide">Location details<textarea name="location_notes" maxlength="500" rows="3" placeholder="Entry gate, floor, or other directions"></textarea></label></div>
+      <button class="button button-primary" type="submit">Submit emergency report <span aria-hidden="true">→</span></button>
+    </form>
+    <p class="sos-privacy">Your report is visible to authorized LifeLink response staff and in your account history.</p>
+  </div>
+</section>
+{% endblock %}
